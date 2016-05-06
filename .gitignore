@@ -8,4 +8,6 @@ out
 .idea
 *.iml
 
+.*.plt
+
 ebin
