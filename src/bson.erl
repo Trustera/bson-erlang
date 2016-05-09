@@ -136,9 +136,12 @@ exclude(Labels, Document) ->
   list_to_tuple(doc_foldr(Fun, [], Document)).
 
 %% @doc Replace field with new value, adding to end if new
--spec update(label(), value(), document()) -> document().
+-spec update(label(), value(), document()) -> document();
+	(label(), value(), map()) -> map().
 update(Label, Value, Document) when is_atom(Label) ->
   update(atom_to_binary(Label, utf8), Value, Document);
+update(Label, Value, Document) when is_map(Document) ->
+  maps:update(Label, Value, Document);
 update(Label, Value, Document) ->
   Parts = binary:split(Label, <<".">>, []),
   case length(Parts) of
@@ -161,7 +164,8 @@ update(Label, Value, Document) ->
   end.
 
 %% @doc First doc overrides second with new fields added at end of second doc
--spec merge(document(), document()) -> document().
+-spec merge(document(), map() | document()) -> document();
+	(map(), map() | document()) -> map().
 merge(UpDoc, BaseDoc) ->
   Fun = fun(Label, Value, Doc) -> update(Label, Value, Doc) end,
   doc_foldl(Fun, BaseDoc, UpDoc).
